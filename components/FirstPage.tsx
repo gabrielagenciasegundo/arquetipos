@@ -8,6 +8,33 @@ import { maskPhoneInput } from "./utils/phone";
 import { calculateArchetypeScores } from "./utils/archetypes";
 import ResultScreen from "./ResultScreen";
 
+// Detecção de tema do navegador
+const useThemeDetection = () => {
+  const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+
+    const isDarkMode =
+      window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setIsDark(isDarkMode);
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsDark(e.matches);
+      document.documentElement.classList.toggle("dark", e.matches);
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+  }, []);
+
+  return { isDark, mounted };
+};
+
 interface Question {
     id: string;
     label: string;
@@ -139,6 +166,8 @@ export default function FirstPage() {
     const timeoutRef = useRef<number | null>(null);
 
     const inputRef = useRef<HTMLInputElement | null>(null);
+
+    const { isDark, mounted } = useThemeDetection();
 
     const allQuestions = useMemo(() => [...initialQuestions, ...archetypeQuestions], []);
     const currentQuestion = allQuestions[currentIndex];
@@ -417,58 +446,115 @@ export default function FirstPage() {
 
     if (showInstructions) {
         return (
-            <div className="flex flex-col justify-center items-center min-h-screen gap-8 px-4">
-                <h1 className="text-4xl font-bold text-center">
-                    Propriedade intelectual e autora do teste: Carol S. Pearson
-                </h1>
-                <h2 className="text-2xl font-semibold">Instruções</h2>
-                <div className="w-full md:w-1/2 lg:w-1/3 text-lg space-y-4">
-                    <p>
-                        Indique a frequência com que cada afirmação descreve melhor o seu comportamento, assinale na frente
-                        de cada questão, o que melhor descreve você nesse momento.
-                    </p>
-                    <div className="space-y-2">
-                        <p>
-                            <strong>A</strong> = Quase nunca aplica-se a mim
-                        </p>
-                        <p>
-                            <strong>B</strong> = Raramente aplica-se a mim
-                        </p>
-                        <p>
-                            <strong>C</strong> = Às vezes aplica-se a mim
-                        </p>
-                        <p>
-                            <strong>D</strong> = Geralmente aplica-se a mim
-                        </p>
-                        <p>
-                            <strong>E</strong> = Quase sempre aplica-se a mim
+            <div className="min-h-screen w-full bg-background dark:bg-slate-950 text-foreground dark:text-slate-100 flex flex-col justify-center items-center gap-8 px-4 py-12">
+                {/* Gradient Background */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-0 left-0 w-96 h-96 bg-green-50 dark:bg-green-950/20 rounded-full blur-3xl opacity-40" />
+                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-green-100 dark:bg-green-900/10 rounded-full blur-3xl opacity-30" />
+                </div>
+
+                <div className="relative z-10 max-w-2xl w-full space-y-8">
+                    {/* Logo/Título Principal */}
+                    <div className="text-center space-y-4">
+                        <div className="text-5xl mb-2">🧠</div>
+                        <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#172516] to-[#36432c] dark:from-green-300 dark:to-green-100 bg-clip-text text-transparent">
+                            Teste de Arquétipos
+                        </h1>
+                        <p className="text-lg text-muted-foreground">
+                            Descubra seu perfil arquetípico pessoal
                         </p>
                     </div>
 
-                    <p className="text-sm text-gray-600">
-                        Dica: nas perguntas do arquétipo, você pode usar as teclas <strong>1</strong> a <strong>5</strong> para
-                        selecionar e avançar automaticamente.
-                    </p>
+                    {/* Créditos */}
+                    <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-border dark:border-slate-700 shadow-md">
+                        <p className="text-center text-sm font-semibold text-[#172516] dark:text-green-400">
+                            ✨ Propriedade intelectual e autora do teste: <span className="font-bold">Carol S. Pearson</span>
+                        </p>
+                    </div>
+
+                    {/* Instruções */}
+                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg p-8 border border-border dark:border-slate-700 space-y-6">
+                        <h2 className="text-3xl font-bold text-foreground dark:text-slate-100">📋 Instruções</h2>
+
+                        <div className="space-y-4">
+                            <p className="text-lg leading-relaxed text-foreground dark:text-slate-300">
+                                Indique a frequência com que cada afirmação descreve melhor o seu comportamento. Assinale na frente de cada questão o que melhor o descreve <span className="font-semibold">neste momento</span>.
+                            </p>
+
+                            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-6 space-y-3 border-l-4 border-[#172516] dark:border-green-400">
+                                <p className="flex items-center gap-3 text-foreground dark:text-slate-200">
+                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#172516] text-white font-bold text-sm">1</span>
+                                    <span>Quase nunca se aplica a mim</span>
+                                </p>
+                                <p className="flex items-center gap-3 text-foreground dark:text-slate-200">
+                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#36432c] text-white font-bold text-sm">2</span>
+                                    <span>Raramente se aplica a mim</span>
+                                </p>
+                                <p className="flex items-center gap-3 text-foreground dark:text-slate-200">
+                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#4a5e40] text-white font-bold text-sm">3</span>
+                                    <span>Às vezes se aplica a mim</span>
+                                </p>
+                                <p className="flex items-center gap-3 text-foreground dark:text-slate-200">
+                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#5e7852] text-white font-bold text-sm">4</span>
+                                    <span>Geralmente se aplica a mim</span>
+                                </p>
+                                <p className="flex items-center gap-3 text-foreground dark:text-slate-200">
+                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#72926a] text-white font-bold text-sm">5</span>
+                                    <span>Quase sempre se aplica a mim</span>
+                                </p>
+                            </div>
+
+                            <div className="bg-green-50 dark:bg-green-950/20 rounded-lg p-4 border border-green-200 dark:border-green-900/50">
+                                <p className="text-sm text-green-900 dark:text-green-100">
+                                    <span className="font-bold">💡 Dica:</span> Nas perguntas do arquétipo, você pode usar as teclas <span className="font-mono font-bold">1</span> a <span className="font-mono font-bold">5</span> para selecionar e avançar automaticamente.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Informações sobre o teste */}
+                    <div className="grid grid-cols-3 gap-4 md:gap-6">
+                        <div className="bg-white dark:bg-slate-900 rounded-lg p-4 text-center border border-border dark:border-slate-700 shadow-sm">
+                            <div className="text-3xl mb-2">⏱️</div>
+                            <p className="text-sm font-semibold text-foreground dark:text-slate-100">~10 min</p>
+                            <p className="text-xs text-muted-foreground">Tempo estimado</p>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 rounded-lg p-4 text-center border border-border dark:border-slate-700 shadow-sm">
+                            <div className="text-3xl mb-2">📝</div>
+                            <p className="text-sm font-semibold text-foreground dark:text-slate-100">75</p>
+                            <p className="text-xs text-muted-foreground">Perguntas</p>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 rounded-lg p-4 text-center border border-border dark:border-slate-700 shadow-sm">
+                            <div className="text-3xl mb-2">🎯</div>
+                            <p className="text-sm font-semibold text-foreground dark:text-slate-100">12</p>
+                            <p className="text-xs text-muted-foreground">Arquétipos</p>
+                        </div>
+                    </div>
+
+                    {/* Botões */}
+                    <div className="flex flex-col gap-4">
+                        <Button 
+                            onClick={handleStart} 
+                            className="w-full bg-gradient-to-r from-[#172516] to-[#36432c] hover:from-[#0f1812] hover:to-[#2a3220] text-white font-bold py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border-0"
+                        >
+                            ▶️ Começar o Teste
+                        </Button>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                clearPersisted();
+                                setAnswers({});
+                                setCurrentIndex(0);
+                                setShowInstructions(true);
+                                setFieldErrors({});
+                            }}
+                            className="w-full text-sm text-muted-foreground hover:text-foreground dark:hover:text-slate-300 underline py-2 transition"
+                        >
+                            Limpar progresso salvo
+                        </button>
+                    </div>
                 </div>
-
-                <Button onClick={handleStart} className="cursor-pointer px-8 py-2 text-lg">
-                    Começar o teste
-                </Button>
-
-                {/* Opcional: se quiser limpar progresso anterior */}
-                <button
-                    type="button"
-                    onClick={() => {
-                        clearPersisted();
-                        setAnswers({});
-                        setCurrentIndex(0);
-                        setShowInstructions(true);
-                        setFieldErrors({});
-                    }}
-                    className="text-sm text-gray-500 underline"
-                >
-                    Limpar progresso salvo
-                </button>
             </div>
         );
     }
@@ -476,147 +562,188 @@ export default function FirstPage() {
     const answered = !!answers[currentQuestion.id];
 
     return (
-        <div className="flex flex-col justify-center items-center min-h-screen gap-8 px-4">
-            <div className="w-full md:w-1/2 lg:w-1/3">
-                <h1 className="text-2xl font-semibold mb-2">
-                    {isInitialPhase ? "Dados Pessoais" : "Perguntas do Arquétipo"}
-                </h1>
+        <div className="min-h-screen w-full bg-background dark:bg-slate-950 text-foreground dark:text-slate-100 flex flex-col justify-center items-center py-12 px-4">
+            {/* Gradient Background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-0 left-0 w-96 h-96 bg-green-50 dark:bg-green-950/20 rounded-full blur-3xl opacity-40" />
+                <div className="absolute bottom-0 right-0 w-96 h-96 bg-green-100 dark:bg-green-900/10 rounded-full blur-3xl opacity-30" />
+            </div>
 
-                <p className="text-gray-600 mb-4">
-                    Pergunta {currentIndex + 1} de {allQuestions.length}
-                </p>
+            <div className="relative z-10 w-full md:w-1/2 lg:w-1/3 max-w-2xl">
+                {/* Header com progresso */}
+                <div className="mb-10 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#172516] to-[#36432c] dark:from-green-300 dark:to-green-100 bg-clip-text text-transparent">
+                            {isInitialPhase ? "Dados Pessoais" : "Perguntas"}
+                        </h1>
+                        <div className="text-sm font-semibold text-muted-foreground bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+                            {currentIndex + 1}/{allQuestions.length}
+                        </div>
+                    </div>
 
-                <div className="w-full bg-gray-200 h-2 rounded-full mb-6">
-                    <div
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${((currentIndex + 1) / allQuestions.length) * 100}%` }}
-                    />
+                    <p className="text-muted-foreground text-sm">
+                        {isInitialPhase 
+                            ? "Comece preenchendo seus dados pessoais" 
+                            : `Pergunta ${currentIndex - initialQuestions.length + 1} de ${archetypeQuestions.length}`
+                        }
+                    </p>
+
+                    {/* Barra de progresso com gradiente */}
+                    <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-[#172516] to-[#36432c] transition-all duration-500 rounded-full"
+                            style={{ width: `${((currentIndex + 1) / allQuestions.length) * 100}%` }}
+                        />
+                    </div>
                 </div>
 
+                {/* Pergunta/Campo */}
                 <div
                     key={currentQuestion.id}
                     className={[
-                        "space-y-6 transition-all duration-200 will-change-transform",
+                        "transition-all duration-200 will-change-transform",
                         isTransitioning
                             ? transitionDir === "next"
-                                ? "opacity-0 translate-y-2"
-                                : "opacity-0 -translate-y-2"
+                                ? "opacity-0 translate-y-4"
+                                : "opacity-0 -translate-y-4"
                             : "opacity-100 translate-y-0",
                     ].join(" ")}
                 >
-                    <h2 className="text-xl font-semibold">{currentQuestion.label}</h2>
+                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg p-8 border border-border dark:border-slate-700 space-y-6">
+                        <h2 className="text-xl md:text-2xl font-semibold text-foreground dark:text-slate-100 leading-relaxed">
+                            {currentQuestion.label}
+                        </h2>
 
-                    {currentQuestion.type === "text" && (
-                        <div className="space-y-2">
+                        {currentQuestion.type === "text" && (
+                            <div className="space-y-3">
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    value={answers[currentQuestion.id] || ""}
+                                    onChange={(e) => handleAnswerChange(e.target.value)}
+                                    onKeyDown={handleInputKeyDown}
+                                    placeholder="Digite sua resposta"
+                                    className="w-full px-4 py-3 border-2 border-border dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#172516] dark:focus:ring-green-400 focus:border-transparent transition"
+                                />
+                                {fieldErrors[currentQuestion.id] && (
+                                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                                        <span>⚠️</span> {fieldErrors[currentQuestion.id]}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
+                        {currentQuestion.type === "email" && (
+                            <div className="space-y-3">
+                                <input
+                                    ref={inputRef}
+                                    type="email"
+                                    value={answers[currentQuestion.id] || ""}
+                                    onChange={(e) => handleAnswerChange(e.target.value)}
+                                    onKeyDown={handleInputKeyDown}
+                                    placeholder="seu@email.com"
+                                    className="w-full px-4 py-3 border-2 border-border dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#172516] dark:focus:ring-green-400 focus:border-transparent transition"
+                                />
+                                {fieldErrors[currentQuestion.id] && (
+                                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                                        <span>⚠️</span> {fieldErrors[currentQuestion.id]}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
+                        {currentQuestion.type === "tel" && (
+                            <div className="space-y-3">
+                                <input
+                                    ref={inputRef}
+                                    type="tel"
+                                    inputMode="tel"
+                                    autoComplete="tel"
+                                    value={answers[currentQuestion.id] || "+55 "}
+                                    onChange={(e) => {
+                                        const masked = maskPhoneInput(e.target.value);
+                                        handleAnswerChange(masked);
+                                    }}
+                                    onKeyDown={handleInputKeyDown}
+                                    placeholder="+55 (11) 99999-9999"
+                                    className="w-full px-4 py-3 border-2 border-border dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#172516] dark:focus:ring-green-400 focus:border-transparent transition"
+                                />
+                                {fieldErrors[currentQuestion.id] && (
+                                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                                        <span>⚠️</span> {fieldErrors[currentQuestion.id]}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
+                        {currentQuestion.type === "date" && (
                             <input
                                 ref={inputRef}
-                                type="text"
+                                type="date"
                                 value={answers[currentQuestion.id] || ""}
                                 onChange={(e) => handleAnswerChange(e.target.value)}
                                 onKeyDown={handleInputKeyDown}
-                                placeholder="Digite sua resposta"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                className="w-full px-4 py-3 border-2 border-border dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#172516] dark:focus:ring-green-400 focus:border-transparent transition"
                             />
-                            {fieldErrors[currentQuestion.id] && (
-                                <p className="text-sm text-red-600">{fieldErrors[currentQuestion.id]}</p>
-                            )}
-                        </div>
-                    )}
+                        )}
 
-                    {currentQuestion.type === "email" && (
-                        <div className="space-y-2">
-                            <input
-                                ref={inputRef}
-                                type="email"
-                                value={answers[currentQuestion.id] || ""}
-                                onChange={(e) => handleAnswerChange(e.target.value)}
-                                onKeyDown={handleInputKeyDown}
-                                placeholder="seu@email.com"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                            />
-                            {fieldErrors[currentQuestion.id] && (
-                                <p className="text-sm text-red-600">{fieldErrors[currentQuestion.id]}</p>
-                            )}
-                        </div>
-                    )}
-
-                    {currentQuestion.type === "tel" && (
-                        <div className="space-y-2">
-                            <input
-                                ref={inputRef}
-                                type="tel"
-                                inputMode="tel"
-                                autoComplete="tel"
-                                value={answers[currentQuestion.id] || "+55 "}
-                                onChange={(e) => {
-                                    const masked = maskPhoneInput(e.target.value);
-                                    handleAnswerChange(masked);
-                                }}
-                                onKeyDown={handleInputKeyDown}
-                                placeholder="+55 (11) 99999-9999"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                            />
-                            {fieldErrors[currentQuestion.id] && (
-                                <p className="text-sm text-red-600">{fieldErrors[currentQuestion.id]}</p>
-                            )}
-                        </div>
-                    )}
-
-
-                    {currentQuestion.type === "date" && (
-                        <input
-                            ref={inputRef}
-                            type="date"
-                            value={answers[currentQuestion.id] || ""}
-                            onChange={(e) => handleAnswerChange(e.target.value)}
-                            onKeyDown={handleInputKeyDown}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                        />
-                    )}
-
-                    {currentQuestion.type === "radio" && currentQuestion.options && (
-                        <div className="space-y-3">
-                            {currentQuestion.options.map((option) => (
-                                <label
-                                    key={option}
-                                    className="flex items-center space-x-3 cursor-pointer p-3 border border-gray-300 rounded-lg hover:bg-gray-50"
-                                >
-                                    <input
-                                        type="radio"
-                                        name={currentQuestion.id}
-                                        value={option}
-                                        checked={answers[currentQuestion.id] === option}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            const isLikert = currentQuestion.options === LIKERT_1_5_OPTIONS;
-
-                                            // aqui continua como você já vinha fazendo
-                                            const autoAdvance = isLikert || true;
-
-                                            selectAndMaybeAdvance(value, autoAdvance);
-                                        }}
-                                        className="w-4 h-4 cursor-pointer"
-                                    />
-                                    <span>{option}</span>
-                                </label>
-                            ))}
-                        </div>
-                    )}
+                        {currentQuestion.type === "radio" && currentQuestion.options && (
+                            <div className="space-y-2">
+                                {currentQuestion.options.map((option, idx) => (
+                                    <label
+                                        key={option}
+                                        className="flex items-center space-x-4 cursor-pointer p-4 border-2 border-border dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group"
+                                    >
+                                        <div className="flex-shrink-0">
+                                            <input
+                                                type="radio"
+                                                name={currentQuestion.id}
+                                                value={option}
+                                                checked={answers[currentQuestion.id] === option}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    const isLikert = currentQuestion.options === LIKERT_1_5_OPTIONS;
+                                                    const autoAdvance = isLikert || true;
+                                                    selectAndMaybeAdvance(value, autoAdvance);
+                                                }}
+                                                className="w-5 h-5 cursor-pointer accent-[#172516] dark:accent-green-400"
+                                            />
+                                        </div>
+                                        <span className="text-foreground dark:text-slate-300 group-hover:text-[#172516] dark:group-hover:text-green-400 transition">
+                                            {option}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                <div className="flex gap-4 mt-8">
-                    <Button onClick={handlePrevious} disabled={!canGoPrev || isTransitioning} className="cursor-pointer">
-                        Anterior
+                {/* Botões de navegação */}
+                <div className="flex gap-3 mt-8">
+                    <Button 
+                        onClick={handlePrevious} 
+                        disabled={!canGoPrev || isTransitioning}
+                        className="flex-1 bg-slate-200 dark:bg-slate-800 text-foreground dark:text-slate-100 hover:bg-slate-300 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold py-3 rounded-lg transition border border-border dark:border-slate-600"
+                    >
+                        ← Anterior
                     </Button>
 
                     <Button
                         onClick={handleNext}
                         disabled={!answered || isTransitioning}
-                        className="cursor-pointer"
+                        className="flex-1 bg-gradient-to-r from-[#172516] to-[#36432c] hover:from-[#0f1812] hover:to-[#2a3220] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transition border-0"
                     >
-                        {isLastQuestion ? "Finalizar" : "Próximo"}
+                        {isLastQuestion ? "✅ Finalizar" : "Próximo →"}
                     </Button>
                 </div>
+
+                {/* Dica de teclado */}
+                {!isInitialPhase && (
+                    <p className="text-xs text-muted-foreground text-center mt-6 opacity-70">
+                        💡 Use Backspace para voltar, Enter para avançar, ou 1-5 para responder
+                    </p>
+                )}
             </div>
         </div>
     );
