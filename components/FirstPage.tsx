@@ -10,29 +10,29 @@ import ResultScreen from "./ResultScreen";
 
 // Detecção de tema do navegador
 const useThemeDetection = () => {
-  const [isDark, setIsDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
+    const [isDark, setIsDark] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
+    useEffect(() => {
+        setMounted(true);
 
-    const isDarkMode =
-      window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setIsDark(isDarkMode);
+        const isDarkMode =
+            window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        setIsDark(isDarkMode);
 
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsDark(e.matches);
-      document.documentElement.classList.toggle("dark", e.matches);
-    };
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        const handleChange = (e: MediaQueryListEvent) => {
+            setIsDark(e.matches);
+            document.documentElement.classList.toggle("dark", e.matches);
+        };
 
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener("change", handleChange);
-      return () => mediaQuery.removeEventListener("change", handleChange);
-    }
-  }, []);
+        if (mediaQuery.addEventListener) {
+            mediaQuery.addEventListener("change", handleChange);
+            return () => mediaQuery.removeEventListener("change", handleChange);
+        }
+    }, []);
 
-  return { isDark, mounted };
+    return { isDark, mounted };
 };
 
 interface Question {
@@ -456,10 +456,13 @@ export default function FirstPage() {
                 <div className="relative z-10 max-w-2xl w-full space-y-8">
                     {/* Logo/Título Principal */}
                     <div className="text-center space-y-4">
-                        <div className="text-5xl mb-2">🧠</div>
+
                         <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#172516] to-[#36432c] dark:from-green-300 dark:to-green-100 bg-clip-text text-transparent">
-                            Teste de Arquétipos
+                            Agencia Segundo
                         </h1>
+                        <h2 className="text-5xl md:text-3xl font-bold bg-gradient-to-r from-[#172516] to-[#36432c] dark:from-green-300 dark:to-green-100 bg-clip-text text-transparent">
+                            Teste de Arquétipos
+                        </h2>
                         <p className="text-lg text-muted-foreground">
                             Descubra seu perfil arquetípico pessoal
                         </p>
@@ -468,7 +471,7 @@ export default function FirstPage() {
                     {/* Créditos */}
                     <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-border dark:border-slate-700 shadow-md">
                         <p className="text-center text-sm font-semibold text-[#172516] dark:text-green-400">
-                            ✨ Propriedade intelectual e autora do teste: <span className="font-bold">Carol S. Pearson</span>
+                            Propriedade intelectual e autora do teste: <span className="font-bold">Carol S. Pearson</span>
                         </p>
                     </div>
 
@@ -533,8 +536,8 @@ export default function FirstPage() {
 
                     {/* Botões */}
                     <div className="flex flex-col gap-4">
-                        <Button 
-                            onClick={handleStart} 
+                        <Button
+                            onClick={handleStart}
                             className="w-full bg-gradient-to-r from-[#172516] to-[#36432c] hover:from-[#0f1812] hover:to-[#2a3220] text-white font-bold py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border-0"
                         >
                             ▶️ Começar o Teste
@@ -582,8 +585,8 @@ export default function FirstPage() {
                     </div>
 
                     <p className="text-muted-foreground text-sm">
-                        {isInitialPhase 
-                            ? "Comece preenchendo seus dados pessoais" 
+                        {isInitialPhase
+                            ? "Comece preenchendo seus dados pessoais"
                             : `Pergunta ${currentIndex - initialQuestions.length + 1} de ${archetypeQuestions.length}`
                         }
                     </p>
@@ -721,8 +724,8 @@ export default function FirstPage() {
 
                 {/* Botões de navegação */}
                 <div className="flex gap-3 mt-8">
-                    <Button 
-                        onClick={handlePrevious} 
+                    <Button
+                        onClick={handlePrevious}
                         disabled={!canGoPrev || isTransitioning}
                         className="flex-1 bg-slate-200 dark:bg-slate-800 text-foreground dark:text-slate-100 hover:bg-slate-300 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold py-3 rounded-lg transition border border-border dark:border-slate-600"
                     >
