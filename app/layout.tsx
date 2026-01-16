@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/agencia-segundo_cut.png",
+        url: "/logo.png",
         width: 1200,
         height: 630,
         alt: "Teste de Arquétipos – Agência Segundo",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     title: "Teste de Arquétipos | Agência Segundo",
     description:
       "Descubra seus arquétipos dominantes e use isso para evoluir seu posicionamento pessoal e profissional.",
-    images: ["/agencia-segundo_cut.png"],
+    images: ["/logo.png"],
   },
 
   robots: {
