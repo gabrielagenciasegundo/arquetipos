@@ -135,16 +135,16 @@ export default function ResultScreen({
 
     drawSectionTitle("Arquétipo dominante");
     drawParagraph(`${dominant.archetype.name} — Pontuação: ${dominant.score}/30 (${dominant.percentage.toFixed(1)}%)`);
-    drawParagraph(`Descrição: ${dominant.archetype.description}`);
-    drawParagraph(`Foco principal: ${dominant.archetype.focus}`);
+    // drawParagraph(`Descrição: ${dominant.archetype.description}`);
+    // drawParagraph(`Foco principal: ${dominant.archetype.focus}`);
 
     drawSectionTitle("Arquétipo secundário");
     drawParagraph(`${secondary.archetype.name} — Pontuação: ${secondary.score}/30 (${secondary.percentage.toFixed(1)}%)`);
-    drawParagraph(`Descrição: ${secondary.archetype.description}`);
+    // drawParagraph(`Descrição: ${secondary.archetype.description}`);
 
     drawSectionTitle("Arquétipo terciário");
     drawParagraph(`${tertiary.archetype.name} — Pontuação: ${tertiary.score}/30 (${tertiary.percentage.toFixed(1)}%)`);
-    drawParagraph(`Descrição: ${tertiary.archetype.description}`);
+    // drawParagraph(`Descrição: ${tertiary.archetype.description}`);
 
     drawSectionTitle("Ranking completo");
     scores.forEach((score, index) => {

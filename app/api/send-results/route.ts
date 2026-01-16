@@ -86,10 +86,10 @@ export async function POST(req: Request) {
       "Top arquétipos:",
       topList,
       "",
-      "Todos os scores:",
-      scoresTable,
-      "",
-      `Data: ${new Date().toISOString()}`,
+      // "Todos os scores:",
+      // scoresTable,
+      // "",
+      `Data: ${new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}`,
     ].join("\n");
     await transporter.sendMail({
       from,
