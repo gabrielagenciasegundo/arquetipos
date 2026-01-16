@@ -27,12 +27,15 @@ export default function FirstPage() {
     setCurrentIndex,
     showInstructions,
     setShowInstructions,
+    showResults,
+    setShowResults,
+    resultsSent,
+    setResultsSent,
     answers,
     setAnswers,
     clear,
   } = usePersistedQuizState(STORAGE_KEY, maxIndex);
 
-  const [showResults, setShowResults] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const { isTransitioning, transitionDir, startTransition } = useStepNavigation(TRANSITION_MS);
@@ -43,7 +46,6 @@ export default function FirstPage() {
   const currentQuestion = allQuestions[currentIndex];
   const isInitialPhase = currentIndex < INITIAL_QUESTIONS.length;
   const isLastQuestion = currentIndex === maxIndex;
-
   const canGoNext = currentIndex < maxIndex;
 
   const setZodErrorsToState = useCallback((zodError: ZodError) => {
@@ -70,8 +72,9 @@ export default function FirstPage() {
     setAnswers({});
     setShowInstructions(true);
     setShowResults(false);
+    setResultsSent(false);
     setFieldErrors({});
-  }, [clear, setAnswers, setCurrentIndex, setShowInstructions]);
+  }, [clear, setAnswers, setCurrentIndex, setShowInstructions, setShowResults, setResultsSent]);
 
   const handleStart = useCallback(() => {
     setShowInstructions(false);
@@ -86,8 +89,10 @@ export default function FirstPage() {
     setAnswers({});
     setCurrentIndex(0);
     setShowInstructions(true);
+    setShowResults(false);
+    setResultsSent(false);
     setFieldErrors({});
-  }, [clear, setAnswers, setCurrentIndex, setShowInstructions]);
+  }, [clear, setAnswers, setCurrentIndex, setShowInstructions, setShowResults, setResultsSent]);
 
   const handleAnswerChange = useCallback(
     (value: string) => {
@@ -102,7 +107,6 @@ export default function FirstPage() {
   );
 
   const handleBack = useCallback(() => {
-    // Caso especial: primeira pergunta → volta para instruções
     if (currentIndex === 0) {
       setShowInstructions(true);
       setShowResults(false);
@@ -110,22 +114,17 @@ export default function FirstPage() {
       return;
     }
 
-    // Caso normal: volta uma pergunta
-    if (!isTransitioning) {
-      startTransition("prev", () =>
-        setCurrentIndex((i) => Math.max(0, i - 1))
-      );
-    }
+    if (isTransitioning) return;
+
+    startTransition("prev", () => setCurrentIndex((i) => Math.max(0, i - 1)));
   }, [
     currentIndex,
     isTransitioning,
     setShowInstructions,
     setShowResults,
-    setFieldErrors,
     startTransition,
     setCurrentIndex,
   ]);
-
 
   const handleNext = useCallback(() => {
     const value = answers[currentQuestion.id];
@@ -146,11 +145,42 @@ export default function FirstPage() {
 
     if (isLastQuestion) {
       setShowResults(true);
+
+      // idempotência: trava antes para evitar duplo clique / refresh etc.
+      if (!resultsSent) {
+        setResultsSent(true);
+
+        const scores = calculateArchetypeScores(answers);
+        fetch("/api/send-results", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            personalData: {
+              nome: answers.nome || "",
+              email: answers.email || "",
+              Whatsapp: answers.Whatsapp || "",
+            },
+            scores,
+            top: scores.slice(0, 3),
+          }),
+        }).then((r) => {
+          if (!r.ok) {
+            // se quiser permitir retry automático quando falhar, descomente:
+            // setResultsSent(false);
+          }
+        }).catch(() => {
+          // setResultsSent(false);
+        });
+      }
+
       return;
     }
 
     if (!canGoNext || isTransitioning) return;
-    startTransition("next", () => setCurrentIndex((i) => Math.min(maxIndex, i + 1)));
+
+    startTransition("next", () =>
+      setCurrentIndex((i) => Math.min(maxIndex, i + 1))
+    );
   }, [
     answers,
     currentQuestion.id,
@@ -160,6 +190,9 @@ export default function FirstPage() {
     isTransitioning,
     maxIndex,
     PersonalFieldSchemas,
+    resultsSent,
+    setResultsSent,
+    setShowResults,
     setCurrentIndex,
     setZodErrorsToState,
     startTransition,
@@ -184,6 +217,7 @@ export default function FirstPage() {
     [canGoNext, currentQuestion.id, isTransitioning, maxIndex, setAnswers, setCurrentIndex, startTransition]
   );
 
+  // hooks SEMPRE no topo do componente
   useAutoFocusInput(!showInstructions && !showResults, currentQuestion, inputRef);
   usePhoneCursorLock(!showInstructions && !showResults, currentQuestion, inputRef);
 
@@ -191,11 +225,10 @@ export default function FirstPage() {
     enabled: !showInstructions && !showResults,
     isInitialPhase,
     question: currentQuestion,
-    onPrevious: handleBack, // 👈 aqui
+    onPrevious: handleBack,
     onNext: handleNext,
     onSelectLikert: (opt) => selectAndMaybeAdvance(opt, true),
   });
-
 
   if (showResults) {
     const scores = calculateArchetypeScores(answers);
@@ -225,14 +258,12 @@ export default function FirstPage() {
       isTransitioning={isTransitioning}
       transitionDir={transitionDir}
       isLastQuestion={isLastQuestion}
-      onPrevious={handleBack}   // 👈 aqui
+      onPrevious={handleBack}
       onNext={handleNext}
       onAnswerChange={handleAnswerChange}
       onSelectRadio={(value, autoAdvance) => selectAndMaybeAdvance(value, autoAdvance)}
       onInputEnter={handleNext}
       inputRefExternal={inputRef}
     />
-
   );
-
 }

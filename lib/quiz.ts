@@ -119,5 +119,7 @@ export const STORAGE_KEY = "archetype_test_v2";
 export type PersistedQuizState = {
   currentIndex: number;
   showInstructions: boolean;
+  showResults: boolean;
+  resultsSent: boolean;
   answers: Record<string, string>;
 };
