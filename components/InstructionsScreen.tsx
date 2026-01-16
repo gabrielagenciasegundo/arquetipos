@@ -25,7 +25,7 @@ export default function InstructionsScreen({ onStart, onClearSaved }: Props) {
                         </h1> */}
 
 
-                    <h2 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    <h2 className="font-serif text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                         Teste de Arquétipos
                     </h2>
                     <p className="text-2xl text-muted-foreground">Descubra seu perfil arquetípico pessoal</p>
