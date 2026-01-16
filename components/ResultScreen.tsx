@@ -108,10 +108,10 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-green-100 dark:bg-green-900/10 rounded-full blur-3xl opacity-30" />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="relative z-10 flex flex-col items-center sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="w-full text-center mb-12">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-[#172516] to-[#36432c] dark:from-green-300 dark:to-green-100 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-[#172516] to-[#36432c] dark:from-green-300 dark:to-green-100 bg-clip-text text-transparent">
             Seus Resultados
           </h1>
           <p className="text-lg text-muted-foreground">
@@ -137,7 +137,7 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
                     {dominant.archetype.name}
                   </h2>
                 </div>
-                
+
               </div>
 
               <div className="p-8 space-y-6">
@@ -179,7 +179,7 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
           {/* Secundário */}
           <div className="relative">
             <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 border border-border dark:border-slate-700">
-              <div className="h-16 bg-gradient-to-r from-[#36432c] to-[#4a5e40] p-4 flex items-center justify-between">
+              <div className="h-16 bg-linear-to-r from-[#36432c] to-[#4a5e40] p-4 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-white">{secondary.archetype.name}</h2>
                 <span className="text-3xl opacity-30">2º</span>
               </div>
@@ -199,7 +199,7 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
 
                   <div className="w-full h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-[#36432c] to-[#4a5e40] transition-all duration-500 rounded-full"
+                      className="h-full bg-linear-to-r from-[#36432c] to-[#4a5e40] transition-all duration-500 rounded-full"
                       style={{ width: `${secondary.percentage}%` }}
                     />
                   </div>
@@ -211,8 +211,8 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
           {/* Terciário */}
           <div className="relative">
             <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300 border border-border dark:border-slate-700">
-              <div className="h-14 bg-gradient-to-r from-[#4a5e40] to-[#5e7852] p-4 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white">{tertiary.archetype.name}</h2>
+              <div className="h-14 bg-gradient-r from-[#4a5e40] to-[#5e7852] p-4 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-primary dark:text-white">{tertiary.archetype.name}</h2>
                 <span className="text-2xl opacity-30">3º</span>
               </div>
 
@@ -230,7 +230,7 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
 
                 <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#4a5e40] to-[#5e7852] transition-all duration-500 rounded-full"
+                    className="h-full bg-linear-to-r from-[#36432c] to-[#4a5e40] transition-all duration-500 rounded-full"
                     style={{ width: `${tertiary.percentage}%` }}
                   />
                 </div>
@@ -249,28 +249,40 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
             {scores.map((score, index) => (
               <div
                 key={score.archetype.id}
-                className="group relative flex items-center p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition duration-200 border border-border dark:border-slate-700"
+                className="group relative rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition duration-200 border border-border dark:border-slate-700 p-4"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#172516] to-[#36432c] flex items-center justify-center text-white font-bold text-sm mr-4">
-                  {index + 1}
+                {/* Linha 1: número + nome */}
+                <div className="flex items-start gap-4 min-w-0">
+                  <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-[#172516] to-[#36432c] flex items-center justify-center text-white font-bold text-sm">
+                    {index + 1}
+                  </div>
+
+                  <div className="min-w-0 flex-1 self-center">
+                    <p className="font-semibold text-foreground dark:text-slate-100 truncate">
+                      {score.archetype.name}
+                    </p>
+                  </div>
+
+                  {/* Placar (no mobile pode ir pra baixo; no desktop fica na direita) */}
+                  <div className="shrink-0 hidden sm:block text-right">
+                    <span className="font-bold text-[#172516] dark:text-green-400 text-lg">
+                      {score.score}
+                    </span>
+                    <span className="text-muted-foreground text-sm ml-1">/ 30</span>
+                  </div>
                 </div>
 
-                <div className="flex-1">
-                  <p className="font-semibold text-foreground dark:text-slate-100">
-                    {score.archetype.name}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="w-32 h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                {/* Linha 2: barra + placar no mobile */}
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <div className="w-full sm:w-48 h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-[#172516] to-[#36432c] transition-all duration-500"
                       style={{ width: `${score.percentage}%` }}
                     />
                   </div>
 
-                  <div className="text-right">
-                    <span className="font-bold text-[#172516] dark:text-green-400 text-lg">
+                  <div className="sm:hidden text-right">
+                    <span className="font-bold text-[#172516] dark:text-green-400">
                       {score.score}
                     </span>
                     <span className="text-muted-foreground text-sm ml-1">/ 30</span>
@@ -278,6 +290,7 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
                 </div>
               </div>
             ))}
+
           </div>
         </div>
 
