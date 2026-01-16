@@ -6,7 +6,7 @@ import type { Question } from "@/lib/quiz";
 export function usePhoneCursorLock(
   enabled: boolean,
   question: Question,
-  inputRef: React.RefObject<HTMLInputElement>
+  inputRef: React.RefObject<HTMLInputElement | null>
 ) {
   useEffect(() => {
     if (!enabled) return;
@@ -21,9 +21,7 @@ export function usePhoneCursorLock(
       const len = el.value.length;
       try {
         el.setSelectionRange(len, len);
-      } catch {
-        // alguns browsers podem falhar dependendo do tipo/input state
-      }
+      } catch {}
     }, 0);
 
     return () => window.clearTimeout(t);

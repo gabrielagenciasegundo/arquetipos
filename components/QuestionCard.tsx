@@ -10,7 +10,7 @@ import { maskPhoneInput } from "@/components/utils/phone"; // ajuste path
 type Props = {
   question: Question;
   value: string | undefined;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   fieldError?: string;
   isTransitioning: boolean;
   transitionDir: "next" | "prev";
@@ -156,7 +156,7 @@ export default function QuestionCard({
                     className="sr-only"
                   />
 
-                 
+
 
                   {/* Número (somente Likert) */}
                   {isLikert && (

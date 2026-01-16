@@ -2,11 +2,10 @@
 
 import React, { useMemo, useRef } from "react";
 import type { Question } from "@/lib/quiz";
-import { ARCHETYPE_QUESTIONS, INITIAL_QUESTIONS, LIKERT_1_5_OPTIONS } from "@/lib/quiz";
+import { ARCHETYPE_QUESTIONS, INITIAL_QUESTIONS } from "@/lib/quiz";
 import ProgressHeader from "@/components/ProgressHeader";
 import QuestionCard from "@/components/QuestionCard";
 import NavigationButtons from "@/components/NavigationButtons";
-import Image from "next/image";
 
 type Props = {
     allQuestions: Question[];
@@ -16,13 +15,12 @@ type Props = {
     isTransitioning: boolean;
     transitionDir: "next" | "prev";
     isLastQuestion: boolean;
-    canGoPrev: boolean;
     onPrevious: () => void;
     onNext: () => void;
     onAnswerChange: (value: string) => void;
     onSelectRadio: (value: string, autoAdvance: boolean) => void;
     onInputEnter: () => void;
-    inputRefExternal?: React.RefObject<HTMLInputElement>;
+    inputRefExternal?: React.RefObject<HTMLInputElement | null>;
 };
 
 export default function QuestionScreen({
@@ -33,7 +31,6 @@ export default function QuestionScreen({
     isTransitioning,
     transitionDir,
     isLastQuestion,
-    canGoPrev,
     onPrevious,
     onNext,
     onAnswerChange,
@@ -73,7 +70,8 @@ export default function QuestionScreen({
                 <QuestionCard
                     question={currentQuestion}
                     value={answers[currentQuestion.id]}
-                    inputRef={inputRef as React.RefObject<HTMLInputElement>}
+                    inputRef={inputRef}
+
                     fieldError={fieldErrors[currentQuestion.id]}
                     isTransitioning={isTransitioning}
                     transitionDir={transitionDir}
@@ -83,8 +81,7 @@ export default function QuestionScreen({
                 />
 
                 <NavigationButtons
-                    canGoPrev={canGoPrev}
-                    canGoNext={true}
+                    currentIndex={currentIndex}
                     isTransitioning={isTransitioning}
                     isLastQuestion={isLastQuestion}
                     answered={answered}

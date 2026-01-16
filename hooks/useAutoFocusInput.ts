@@ -6,7 +6,7 @@ import type { Question } from "@/lib/quiz";
 export function useAutoFocusInput(
   enabled: boolean,
   question: Question,
-  inputRef: React.RefObject<HTMLInputElement>
+  inputRef: React.RefObject<HTMLInputElement | null>
 ) {
   useEffect(() => {
     if (!enabled) return;

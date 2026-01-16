@@ -10,12 +10,7 @@ import { calculateArchetypeScores } from "./utils/archetypes";
 import InstructionsScreen from "@/components/InstructionsScreen";
 import QuestionScreen from "@/components/QuestionScreen";
 
-import {
-  ALL_QUESTIONS,
-  INITIAL_QUESTIONS,
-  STORAGE_KEY,
-  TRANSITION_MS,
-} from "@/lib/quiz";
+import { ALL_QUESTIONS, INITIAL_QUESTIONS, STORAGE_KEY, TRANSITION_MS } from "@/lib/quiz";
 
 import { usePersistedQuizState } from "@/hooks/usePersistedQuizState";
 import { useStepNavigation } from "@/hooks/useStepNavigation";
@@ -43,12 +38,12 @@ export default function FirstPage() {
   const { isTransitioning, transitionDir, startTransition } = useStepNavigation(TRANSITION_MS);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const advanceQueuedRef = useRef(false);
 
   const currentQuestion = allQuestions[currentIndex];
   const isInitialPhase = currentIndex < INITIAL_QUESTIONS.length;
   const isLastQuestion = currentIndex === maxIndex;
 
-  const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < maxIndex;
 
   const setZodErrorsToState = useCallback((zodError: ZodError) => {
@@ -80,7 +75,6 @@ export default function FirstPage() {
 
   const handleStart = useCallback(() => {
     setShowInstructions(false);
-
     setAnswers((prev) => ({
       ...prev,
       Whatsapp: prev.Whatsapp?.trim() ? prev.Whatsapp : "+55 ",
@@ -107,10 +101,31 @@ export default function FirstPage() {
     [currentQuestion.id, setAnswers]
   );
 
-  const goPrev = useCallback(() => {
-    if (!canGoPrev || isTransitioning) return;
-    startTransition("prev", () => setCurrentIndex((i) => Math.max(0, i - 1)));
-  }, [canGoPrev, isTransitioning, startTransition, setCurrentIndex]);
+  const handleBack = useCallback(() => {
+    // Caso especial: primeira pergunta → volta para instruções
+    if (currentIndex === 0) {
+      setShowInstructions(true);
+      setShowResults(false);
+      setFieldErrors({});
+      return;
+    }
+
+    // Caso normal: volta uma pergunta
+    if (!isTransitioning) {
+      startTransition("prev", () =>
+        setCurrentIndex((i) => Math.max(0, i - 1))
+      );
+    }
+  }, [
+    currentIndex,
+    isTransitioning,
+    setShowInstructions,
+    setShowResults,
+    setFieldErrors,
+    startTransition,
+    setCurrentIndex,
+  ]);
+
 
   const handleNext = useCallback(() => {
     const value = answers[currentQuestion.id];
@@ -156,30 +171,31 @@ export default function FirstPage() {
 
       setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
 
-      if (autoAdvance && canGoNext) {
+      if (autoAdvance && canGoNext && !advanceQueuedRef.current) {
+        advanceQueuedRef.current = true;
         window.setTimeout(() => {
           startTransition("next", () =>
             setCurrentIndex((i) => Math.min(maxIndex, i + 1))
           );
+          advanceQueuedRef.current = false;
         }, 0);
       }
     },
     [canGoNext, currentQuestion.id, isTransitioning, maxIndex, setAnswers, setCurrentIndex, startTransition]
   );
 
-  // Autofocus e cursor lock
   useAutoFocusInput(!showInstructions && !showResults, currentQuestion, inputRef);
   usePhoneCursorLock(!showInstructions && !showResults, currentQuestion, inputRef);
 
-  // Teclas globais
   useGlobalShortcuts({
     enabled: !showInstructions && !showResults,
     isInitialPhase,
     question: currentQuestion,
-    onPrevious: goPrev,
+    onPrevious: handleBack, // 👈 aqui
     onNext: handleNext,
     onSelectLikert: (opt) => selectAndMaybeAdvance(opt, true),
   });
+
 
   if (showResults) {
     const scores = calculateArchetypeScores(answers);
@@ -209,13 +225,14 @@ export default function FirstPage() {
       isTransitioning={isTransitioning}
       transitionDir={transitionDir}
       isLastQuestion={isLastQuestion}
-      canGoPrev={canGoPrev}
-      onPrevious={goPrev}
+      onPrevious={handleBack}   // 👈 aqui
       onNext={handleNext}
       onAnswerChange={handleAnswerChange}
       onSelectRadio={(value, autoAdvance) => selectAndMaybeAdvance(value, autoAdvance)}
       onInputEnter={handleNext}
       inputRefExternal={inputRef}
     />
+
   );
+
 }
