@@ -2,7 +2,7 @@
 
 import { Button } from "./ui/button";
 import { ArchetypeScore, getTopArchetypes } from "./utils/archetypes";
-import { useEffect, useState } from "react";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 interface ResultScreenProps {
   scores: ArchetypeScore[];
@@ -19,83 +19,168 @@ export default function ResultScreen({
   personalData,
   onRestart,
 }: ResultScreenProps) {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains("dark");
-    setIsDark(isDarkMode);
-
-    const observer = new MutationObserver(() => {
-      const isNowDark = document.documentElement.classList.contains("dark");
-      setIsDark(isNowDark);
-    });
-
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
-
   const topThree = getTopArchetypes(scores, 3);
   const dominant = topThree[0];
   const secondary = topThree[1];
   const tertiary = topThree[2];
 
-  const maxScore = Math.max(...scores.map((s) => s.score));
+  const handleDownload = async () => {
+    const pageWidth = 595.28;
+    const pageHeight = 841.89;
+    const margin = 48;
+    const pdfDoc = await PDFDocument.create();
+    let page = pdfDoc.addPage([pageWidth, pageHeight]);
+    const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-  const handleDownload = () => {
-    const resultText = `
-╔════════════════════════════════════════════════════════════╗
-║          ANÁLISE DE ARQUÉTIPOS PESSOAIS - RESULTADO        ║
-╚════════════════════════════════════════════════════════════╝
+    const colorPrimary = rgb(0.18, 0.23, 0.17);
+    const colorSecondary = rgb(0.35, 0.43, 0.31);
+    const colorMuted = rgb(0.42, 0.45, 0.38);
 
-📋 DADOS PESSOAIS:
-─────────────────────────────────────────────────────────────
-    Nome: ${personalData.nome}
-   Email: ${personalData.email}
-   WhatsApp: ${personalData.Whatsapp}
+    const wrapText = (text: string, font: typeof regularFont, size: number, maxWidth: number) => {
+      const words = text.split(" ");
+      const lines: string[] = [];
+      let line = "";
+      words.forEach((word) => {
+        const test = line ? `${line} ${word}` : word;
+        if (font.widthOfTextAtSize(test, size) <= maxWidth) {
+          line = test;
+        } else {
+          if (line) lines.push(line);
+          line = word;
+        }
+      });
+      if (line) lines.push(line);
+      return lines;
+    };
 
-👑 ARQUÉTIPO DOMINANTE:   ${dominant.archetype.name}
-   Pontuação: ${dominant.score}/30 (${dominant.percentage.toFixed(1)}%)
-   
-   Descrição:
-   ${dominant.archetype.description}
-   
-   Foco: ${dominant.archetype.focus}
+    let cursorY = pageHeight - margin;
+    const contentWidth = pageWidth - margin * 2;
 
-â­ ARQUÃ‰TIPO SECUNDÃRIO:
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ${secondary.archetype.name}
-   Pontuação: ${secondary.score}/30 (${secondary.percentage.toFixed(1)}%)
-   
-   Descrição:
-   ${secondary.archetype.description}
+    const ensureSpace = (needed: number) => {
+      if (cursorY - needed < margin) {
+        page = pdfDoc.addPage([pageWidth, pageHeight]);
+        cursorY = pageHeight - margin;
+      }
+    };
 
-âœ¨ ARQUÃ‰TIPO TERCIÃRIO:
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   ${tertiary.archetype.name}
-   Pontuação: ${tertiary.score}/30 (${tertiary.percentage.toFixed(1)}%)
-   
-   Descrição:
-   ${tertiary.archetype.description}
+    try {
+      const logoBytes = await fetch("/agencia-segundo_cut.png").then((r) => r.arrayBuffer());
+      const logo = await pdfDoc.embedPng(logoBytes);
+      const logoWidth = 140;
+      const logoHeight = (logo.height / logo.width) * logoWidth;
+      page.drawImage(logo, {
+        x: margin,
+        y: cursorY - logoHeight,
+        width: logoWidth,
+        height: logoHeight,
+      });
+      cursorY -= logoHeight + 18;
+    } catch {
+      // Se o logo falhar, segue sem ele.
+    }
 
-ðŸ“Š TODOS OS ARQUÃ‰TIPOS:
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/30 (${s.percentage.toFixed(1)}%)`).join("\n")}
+    page.drawText("Resultado do Teste de Arquétipos", {
+      x: margin,
+      y: cursorY,
+      size: 20,
+      font: boldFont,
+      color: colorPrimary,
+    });
+    cursorY -= 18;
+    page.drawText(`Gerado em: ${new Date().toLocaleString("pt-BR")}`, {
+      x: margin,
+      y: cursorY,
+      size: 10,
+      font: regularFont,
+      color: colorMuted,
+    });
+    cursorY -= 22;
 
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   Gerado em: ${new Date().toLocaleString("pt-BR")}
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-    `.trim();
+    page.drawRectangle({
+      x: margin,
+      y: cursorY - 10,
+      width: contentWidth,
+      height: 1,
+      color: colorSecondary,
+    });
+    cursorY -= 24;
 
+    const drawSectionTitle = (title: string) => {
+      ensureSpace(22);
+      page.drawText(title, {
+        x: margin,
+        y: cursorY,
+        size: 14,
+        font: boldFont,
+        color: colorPrimary,
+      });
+      cursorY -= 18;
+    };
+
+    const drawParagraph = (text: string, size = 11) => {
+      const lines = wrapText(text, regularFont, size, contentWidth);
+      ensureSpace(lines.length * (size + 3));
+      lines.forEach((line) => {
+        page.drawText(line, { x: margin, y: cursorY, size, font: regularFont, color: rgb(0, 0, 0) });
+        cursorY -= size + 3;
+      });
+      cursorY -= 6;
+    };
+
+    drawSectionTitle("Dados pessoais");
+    drawParagraph(`Nome: ${personalData.nome}`);
+    drawParagraph(`Email: ${personalData.email}`);
+    drawParagraph(`WhatsApp: ${personalData.Whatsapp}`);
+
+    drawSectionTitle("Arquétipo dominante");
+    drawParagraph(`${dominant.archetype.name} — Pontuação: ${dominant.score}/30 (${dominant.percentage.toFixed(1)}%)`);
+    drawParagraph(`Descrição: ${dominant.archetype.description}`);
+    drawParagraph(`Foco principal: ${dominant.archetype.focus}`);
+
+    drawSectionTitle("Arquétipo secundário");
+    drawParagraph(`${secondary.archetype.name} — Pontuação: ${secondary.score}/30 (${secondary.percentage.toFixed(1)}%)`);
+    drawParagraph(`Descrição: ${secondary.archetype.description}`);
+
+    drawSectionTitle("Arquétipo terciário");
+    drawParagraph(`${tertiary.archetype.name} — Pontuação: ${tertiary.score}/30 (${tertiary.percentage.toFixed(1)}%)`);
+    drawParagraph(`Descrição: ${tertiary.archetype.description}`);
+
+    drawSectionTitle("Ranking completo");
+    scores.forEach((score, index) => {
+      ensureSpace(16);
+      page.drawText(
+        `${index + 1}. ${score.archetype.name} — ${score.score}/30 (${score.percentage.toFixed(1)}%)`,
+        { x: margin, y: cursorY, size: 11, font: regularFont, color: rgb(0, 0, 0) }
+      );
+      cursorY -= 15;
+    });
+
+
+    const pdfBytes = await pdfDoc.save();
+
+    const pdfArrayBuffer = pdfBytes.buffer.slice(
+      pdfBytes.byteOffset,
+      pdfBytes.byteOffset + pdfBytes.byteLength
+    ) as ArrayBuffer;
+
+
+    const blob = await new Response(pdfArrayBuffer, {
+      headers: { "Content-Type": "application/pdf" },
+    }).blob();
+
+
+
+
+    const url = URL.createObjectURL(blob);
     const element = document.createElement("a");
-    element.setAttribute(
-      "href",
-      "data:text/plain;charset=utf-8," + encodeURIComponent(resultText)
-    );
-    element.setAttribute("download", `resultado-arquetipos-${Date.now()}.txt`);
+    element.href = url;
+    element.download = `resultado-arquetipos-${Date.now()}.pdf`;
     element.style.display = "none";
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -122,20 +207,19 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
           </div>
         </div>
 
-        {/* Top 3 ArquÃ©tipos */}
+        {/* Top 3 Arquétipos */}
         <div className="w-full grid gap-8 mb-12">
           {/* Dominante */}
           <div className="group relative">
             <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-2xl blur-lg opacity-70 group-hover:opacity-100 transition duration-300" />
             <div className="relative bg-card rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition duration-300">
-              <div className="h-24 bg-gradient-to-r from-primary to-secondary p-6 flex items-center justify-between">
+              <div className="h-24 bg-gradient-to-r from-background to-secondary p-6 flex items-center justify-between">
                 <div>
                   <div className="text-white text-sm font-semibold opacity-90">ARQUÉTIPO DOMINANTE</div>
                   <h2 className="text-3xl md:text-4xl font-bold text-white">
                     {dominant.archetype.name}
                   </h2>
                 </div>
-
               </div>
 
               <div className="p-8 space-y-6">
@@ -174,7 +258,7 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
             </div>
           </div>
 
-          {/* SecundÃ¡rio */}
+          {/* Secundário */}
           <div className="relative">
             <div className="bg-card rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 border border-border">
               <div className="h-16 bg-gradient-to-r from-secondary to-accent p-4 flex items-center justify-between">
@@ -206,7 +290,7 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
             </div>
           </div>
 
-          {/* TerciÃ¡rio */}
+          {/* Terciário */}
           <div className="relative">
             <div className="bg-card rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300 border border-border">
               <div className="h-14 bg-gradient-to-r from-secondary to-accent p-4 flex items-center justify-between">
@@ -249,9 +333,9 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
                 key={score.archetype.id}
                 className="group relative rounded-lg bg-muted hover:bg-muted transition duration-200 border border-border p-4"
               >
-                {/* Linha 1: nÃºmero + nome */}
+                {/* Linha 1: número + nome */}
                 <div className="flex items-start gap-4 min-w-0">
-                  <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-bold text-sm">
+                  <div className="shrink-0 w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-white font-bold text-sm">
                     {index + 1}
                   </div>
 
@@ -288,32 +372,31 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
                 </div>
               </div>
             ))}
-
           </div>
         </div>
 
-        {/* InterpretaÃ§Ã£o */}
+        {/* Interpretação */}
         <div className="w-full bg-gradient-to-br from-primary to-secondary rounded-xl p-8 mb-12 text-white shadow-lg">
-          <h3 className="text-2xl font-bold mb-6">🎯 O que significa seu resultado?</h3>
+          <h3 className="text-2xl font-bold mb-6">🧠 O que significa seu resultado?</h3>
 
           <div className="space-y-4">
             <p className="leading-relaxed text-lg">
-              Seu arquÃ©tipo dominante Ã© <span className="font-bold">{dominant.archetype.name}</span>, o que significa que
-              vocÃª possui uma forte tendÃªncia para <span className="font-bold">{dominant.archetype.focus.toLowerCase()}</span>. Este Ã© o seu principal driver comportamental e motivacional.
+              Seu arquétipo dominante é <span className="font-bold">{dominant.archetype.name}</span>, o que significa que
+              você possui uma forte tendência para <span className="font-bold">{dominant.archetype.focus.toLowerCase()}</span>. Este é o seu principal driver comportamental e motivacional.
             </p>
 
             <p className="leading-relaxed text-lg">
-              A combinaÃ§Ã£o com os arquÃ©tipos secundÃ¡rio (<span className="font-bold">{secondary.archetype.name}</span>) e terciÃ¡rio (
-              <span className="font-bold">{tertiary.archetype.name}</span>) cria um perfil Ãºnico que o torna versÃ¡til e capaz de se adaptar a diferentes situaÃ§Ãµes.
+              A combinação com os arquétipos secundário (<span className="font-bold">{secondary.archetype.name}</span>) e terciário (
+              <span className="font-bold">{tertiary.archetype.name}</span>) cria um perfil único que o torna versátil e capaz de se adaptar a diferentes situações.
             </p>
 
             <p className="leading-relaxed text-lg">
-              Essa anÃ¡lise pode ser valiosa para autoconhecimento, desenvolvimento pessoal, alinhamento de carreira e relacionamentos interpessoais.
+              Essa análise pode ser valiosa para autoconhecimento, desenvolvimento pessoal, alinhamento de carreira e relacionamentos interpessoais.
             </p>
           </div>
         </div>
 
-        {/* InformaÃ§Ãµes de Contato */}
+        {/* Informações de Contato */}
         <div className="w-full bg-card rounded-lg p-6 mb-12 border-l-4 border-primary shadow-md">
           <h3 className="text-lg font-bold text-foreground mb-4">✉️ Seus Dados Pessoais</h3>
           <div className="grid gap-3 text-sm">
@@ -332,28 +415,23 @@ ${scores.map((s, i) => `   ${i + 1}. ${s.archetype.name.padEnd(30)} ${s.score}/3
           </div>
         </div>
 
-        {/* BotÃµes de AÃ§Ã£o */}
+        {/* Botões de Ação */}
         <div className="w-full flex flex-col sm:flex-row gap-4">
           <Button
             onClick={handleDownload}
             className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-primary hover:to-accent text-primary-foreground font-bold py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border-0"
           >
-            📥 Baixar Resultado (TXT)
+            📄 Baixar Resultado (PDF)
           </Button>
 
           <Button
             onClick={onRestart}
             className="flex-1 bg-muted text-primary hover:bg-muted/80 font-bold py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border-2 border-primary"
           >
-            🔄 Refazer o Teste
+            🔁 Refazer o Teste
           </Button>
         </div>
       </div>
     </div>
   );
 }
-
-
-
-
-

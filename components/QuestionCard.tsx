@@ -74,7 +74,7 @@ export default function QuestionCard({
             />
             {fieldError && (
               <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                <span>âš ï¸</span> {fieldError}
+                <span>⚠️</span> {fieldError}
               </p>
             )}
           </div>
@@ -93,7 +93,7 @@ export default function QuestionCard({
             />
             {fieldError && (
               <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                <span>âš ï¸</span> {fieldError}
+                <span>⚠️</span> {fieldError}
               </p>
             )}
           </div>
@@ -114,7 +114,7 @@ export default function QuestionCard({
             />
             {fieldError && (
               <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                <span>âš ï¸</span> {fieldError}
+                <span>⚠️</span> {fieldError}
               </p>
             )}
           </div>
