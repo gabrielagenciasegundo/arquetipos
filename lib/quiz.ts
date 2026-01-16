@@ -1,24 +1,18 @@
-export interface Question {
-  id: string;
-  label: string;
-  type: "text" | "email" | "date" | "tel" | "select" | "radio";
-  options?: readonly string[];
-  required?: boolean;
-}
-
 export const INITIAL_QUESTIONS: Question[] = [
   { id: "nome", label: "Nome", type: "text", required: true },
   { id: "Whatsapp", label: "WhatsApp", type: "tel", required: true },
   { id: "email", label: "Endereço de email", type: "email", required: true },
 ];
 
-export const LIKERT_1_5_OPTIONS = [
-  "1 - Quase nunca se aplica a mim",
-  "2 - Raramente aplica-se a mim",
-  "3 - Às vezes aplica-se a mim",
-  "4 - Geralmente se aplica a mim",
-  "5 - Quase sempre se aplica a mim",
+export const LIKERT_1_5 = [
+  { value: "1", label: "Quase nunca se aplica a mim" },
+  { value: "2", label: "Raramente se aplica a mim" },
+  { value: "3", label: "Às vezes se aplica a mim" },
+  { value: "4", label: "Geralmente se aplica a mim" },
+  { value: "5", label: "Quase sempre se aplica a mim" },
 ] as const;
+
+export type LikertValue = typeof LIKERT_1_5[number]["value"];
 
 export const ARCHETYPE_STATEMENTS = [
   "Eu reúno informações sem formar juízos.",
@@ -95,19 +89,32 @@ export const ARCHETYPE_STATEMENTS = [
   "O ato de procurar alguma coisa é tão importante quanto encontrá-la.",
 ] as const;
 
+export type Option =
+  | { value: string; label: string } // novo
+  | string; // compat (se você tiver outros radios simples)
+
+export interface Question {
+  id: string;
+  label: string;
+  type: "text" | "email" | "date" | "tel" | "select" | "radio";
+  options?: readonly Option[];
+  required?: boolean;
+}
+
 export const ARCHETYPE_QUESTIONS: Question[] = ARCHETYPE_STATEMENTS.map((text, i) => ({
   id: `q${i + 1}`,
   label: `${i + 1} - ${text}`,
   type: "radio",
-  options: LIKERT_1_5_OPTIONS,
+  options: LIKERT_1_5, // agora é array de {value,label}
   required: true,
 }));
+
 
 export const ALL_QUESTIONS: Question[] = [...INITIAL_QUESTIONS, ...ARCHETYPE_QUESTIONS];
 
 export const TRANSITION_MS = 180;
 
-export const STORAGE_KEY = "archetype_test_v1";
+export const STORAGE_KEY = "archetype_test_v2";
 
 export type PersistedQuizState = {
   currentIndex: number;

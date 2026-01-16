@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { LIKERT_1_5_OPTIONS } from "@/lib/quiz";
+import { LIKERT_1_5 } from "@/lib/quiz";
 import type { Question } from "@/lib/quiz";
 
 type Params = {
@@ -45,12 +45,11 @@ export function useGlobalShortcuts({
       const isArchetypeLikert =
         !isInitialPhase &&
         question.type === "radio" &&
-        question.options === LIKERT_1_5_OPTIONS;
+        question.options === LIKERT_1_5;
 
       if (isArchetypeLikert && e.key >= "1" && e.key <= "5") {
         e.preventDefault();
-        const idx = Number(e.key) - 1;
-        onSelectLikert(LIKERT_1_5_OPTIONS[idx]);
+        onSelectLikert(e.key); // agora é o próprio "1".."5"
       }
     };
 

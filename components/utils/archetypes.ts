@@ -115,25 +115,25 @@ export interface ArchetypeScore {
 export function calculateArchetypeScores(
   answers: Record<string, string>
 ): ArchetypeScore[] {
+  const getLikert = (id: string) => {
+    const v = answers[id];
+    const n = Number(v);
+    // esperado: "1".."5"
+    if (!Number.isFinite(n)) return 0;
+    // clamp de segurança (caso venha lixo)
+    if (n < 1) return 0;
+    if (n > 5) return 5;
+    return n;
+  };
+
   const scores = ARCHETYPES.map((archetype) => {
-    let total = 0;
-
-    archetype.questions.forEach((questionNum) => {
+    const total = archetype.questions.reduce((sum, questionNum) => {
       const questionId = `q${questionNum}`;
-      const answer = answers[questionId];
+      return sum + getLikert(questionId);
+    }, 0);
 
-      if (answer) {
-        // Extrai o número (1-5) da resposta (ex: "1 - Quase nunca..." -> 1)
-        const match = answer.match(/^(\d)/);
-        if (match) {
-          total += parseInt(match[1], 10);
-        }
-      }
-    });
-
-    // Percentagem baseada no máximo possível (6 questões * 5 = 30)
-    const maxScore = 30;
-    const percentage = (total / maxScore) * 100;
+    const maxScore = archetype.questions.length * 5; // robusto
+    const percentage = maxScore > 0 ? (total / maxScore) * 100 : 0;
 
     return {
       archetype,
@@ -142,7 +142,6 @@ export function calculateArchetypeScores(
     };
   });
 
-  // Ordena por pontuação decrescente
   return scores.sort((a, b) => b.score - a.score);
 }
 
@@ -152,3 +151,4 @@ export function getTopArchetypes(
 ): ArchetypeScore[] {
   return scores.slice(0, count);
 }
+

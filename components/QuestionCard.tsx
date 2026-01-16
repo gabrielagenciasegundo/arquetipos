@@ -2,7 +2,8 @@
 
 import React from "react";
 import type { Question } from "@/lib/quiz";
-import { LIKERT_1_5_OPTIONS } from "@/lib/quiz";
+import { LIKERT_1_5 } from "@/lib/quiz";
+import { Option } from "@/lib/quiz";
 import { maskPhoneInput } from "@/components/utils/phone"; // ajuste path
 // Se seu utils/phone está em outro lugar, corrija o import.
 
@@ -17,6 +18,14 @@ type Props = {
   onSelectRadio: (value: string, autoAdvance: boolean) => void;
   onInputEnter: () => void;
 };
+
+function isObjectOption(opt: Option): opt is { value: string; label: string } {
+  return typeof opt === "object" && opt !== null && "value" in opt && "label" in opt;
+}
+
+function isLikertOptions(options: readonly Option[] | undefined) {
+  return options === LIKERT_1_5;
+}
 
 export default function QuestionCard({
   question,
@@ -124,29 +133,48 @@ export default function QuestionCard({
 
         {question.type === "radio" && question.options && (
           <div className="space-y-2">
-            {question.options.map((option) => {
-              const isLikert = question.options === LIKERT_1_5_OPTIONS;
+            {question.options.map((opt) => {
+              const { value: optValue, label: optLabel } = isObjectOption(opt)
+                ? opt
+                : { value: String(opt), label: String(opt) };
+
+              const isLikert = isLikertOptions(question.options);
+              const selected = value === optValue;
 
               return (
                 <label
-                  key={option}
-                  className="flex items-center space-x-4 cursor-pointer p-4 border-2 border-border dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group"
+                  key={optValue}
+                  className="flex items-center gap-4 cursor-pointer p-4 border-2 border-border dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group"
                 >
-                  <div className="flex-shrink-0">
-                    <input
-                      type="radio"
-                      name={question.id}
-                      value={option}
-                      checked={value === option}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        onSelectRadio(v, isLikert); // auto-advance somente no Likert
-                      }}
-                      className="w-5 h-5 cursor-pointer accent-[#172516] dark:accent-green-400"
-                    />
-                  </div>
+                  {/* input real (acessível) */}
+                  <input
+                    type="radio"
+                    name={question.id}
+                    value={optValue}
+                    checked={selected}
+                    onChange={(e) => onSelectRadio(e.target.value, isLikert)}
+                    className="sr-only"
+                  />
+
+                 
+
+                  {/* Número (somente Likert) */}
+                  {isLikert && (
+                    <span
+                      className={[
+                        "inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition",
+                        selected
+                          ? "bg-[#172516] text-white dark:bg-green-400 dark:text-slate-950"
+                          : "bg-slate-100 text-foreground dark:bg-slate-800 dark:text-slate-100",
+                      ].join(" ")}
+                    >
+                      {optValue}
+                    </span>
+                  )}
+
+                  {/* Texto fora */}
                   <span className="text-foreground dark:text-slate-300 group-hover:text-[#172516] dark:group-hover:text-green-400 transition">
-                    {option}
+                    {optLabel}
                   </span>
                 </label>
               );

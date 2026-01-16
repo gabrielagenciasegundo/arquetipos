@@ -13,7 +13,6 @@ import QuestionScreen from "@/components/QuestionScreen";
 import {
   ALL_QUESTIONS,
   INITIAL_QUESTIONS,
-  LIKERT_1_5_OPTIONS,
   STORAGE_KEY,
   TRANSITION_MS,
 } from "@/lib/quiz";
