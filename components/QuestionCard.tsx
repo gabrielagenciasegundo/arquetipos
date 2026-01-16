@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import type { Question } from "@/lib/quiz";
 import { LIKERT_1_5 } from "@/lib/quiz";
 import { Option } from "@/lib/quiz";
 import { maskPhoneInput } from "@/components/utils/phone"; // ajuste path
-// Se seu utils/phone está em outro lugar, corrija o import.
+// Se seu utils/phone estÃ¡ em outro lugar, corrija o import.
 
 type Props = {
   question: Question;
@@ -56,8 +56,8 @@ export default function QuestionCard({
 
   return (
     <div key={question.id} className={containerClass}>
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg p-8 border border-border dark:border-slate-700 space-y-6">
-        <h2 className="text-xl md:text-2xl font-semibold text-foreground dark:text-slate-100 leading-relaxed">
+      <div className="bg-card rounded-xl shadow-lg p-8 border border-border space-y-6">
+        <h2 className="text-xl md:text-2xl font-semibold text-foreground leading-relaxed">
           {question.label}
         </h2>
 
@@ -70,11 +70,11 @@ export default function QuestionCard({
               onChange={(e) => onChange(e.target.value)}
               onKeyDown={handleInputKeyDown}
               placeholder="Digite sua resposta"
-              className="w-full px-4 py-3 border-2 border-border dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#172516] dark:focus:ring-green-400 focus:border-transparent transition"
+              className="w-full px-4 py-3 border-2 border-border bg-muted text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
             />
             {fieldError && (
               <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                <span>⚠️</span> {fieldError}
+                <span>âš ï¸</span> {fieldError}
               </p>
             )}
           </div>
@@ -89,11 +89,11 @@ export default function QuestionCard({
               onChange={(e) => onChange(e.target.value)}
               onKeyDown={handleInputKeyDown}
               placeholder="seu@email.com"
-              className="w-full px-4 py-3 border-2 border-border dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#172516] dark:focus:ring-green-400 focus:border-transparent transition"
+              className="w-full px-4 py-3 border-2 border-border bg-muted text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
             />
             {fieldError && (
               <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                <span>⚠️</span> {fieldError}
+                <span>âš ï¸</span> {fieldError}
               </p>
             )}
           </div>
@@ -110,11 +110,11 @@ export default function QuestionCard({
               onChange={(e) => onChange(maskPhoneInput(e.target.value))}
               onKeyDown={handleInputKeyDown}
               placeholder="+55 (11) 99999-9999"
-              className="w-full px-4 py-3 border-2 border-border dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#172516] dark:focus:ring-green-400 focus:border-transparent transition"
+              className="w-full px-4 py-3 border-2 border-border bg-muted text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
             />
             {fieldError && (
               <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                <span>⚠️</span> {fieldError}
+                <span>âš ï¸</span> {fieldError}
               </p>
             )}
           </div>
@@ -127,7 +127,7 @@ export default function QuestionCard({
             value={value ?? ""}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={handleInputKeyDown}
-            className="w-full px-4 py-3 border-2 border-border dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#172516] dark:focus:ring-green-400 focus:border-transparent transition"
+            className="w-full px-4 py-3 border-2 border-border bg-muted text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
           />
         )}
 
@@ -144,9 +144,9 @@ export default function QuestionCard({
               return (
                 <label
                   key={optValue}
-                  className="flex items-center gap-4 cursor-pointer p-4 border-2 border-border dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group"
+                  className="flex items-center gap-4 cursor-pointer p-4 border-2 border-border rounded-lg hover:bg-muted transition group"
                 >
-                  {/* input real (acessível) */}
+                  {/* input real (acessÃ­vel) */}
                   <input
                     type="radio"
                     name={question.id}
@@ -158,14 +158,14 @@ export default function QuestionCard({
 
 
 
-                  {/* Número (somente Likert) */}
+                  {/* NÃºmero (somente Likert) */}
                   {isLikert && (
                     <span
                       className={[
                         "inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition",
                         selected
-                          ? "bg-[#172516] text-white dark:bg-green-400 dark:text-slate-950"
-                          : "bg-slate-100 text-foreground dark:bg-slate-800 dark:text-slate-100",
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-foreground",
                       ].join(" ")}
                     >
                       {optValue}
@@ -173,7 +173,7 @@ export default function QuestionCard({
                   )}
 
                   {/* Texto fora */}
-                  <span className="text-foreground dark:text-slate-300 group-hover:text-[#172516] dark:group-hover:text-green-400 transition">
+                  <span className="text-foreground group-hover:text-primary transition">
                     {optLabel}
                   </span>
                 </label>
@@ -185,3 +185,4 @@ export default function QuestionCard({
     </div>
   );
 }
+

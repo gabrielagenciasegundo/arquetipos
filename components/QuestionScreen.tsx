@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useMemo, useRef } from "react";
 import type { Question } from "@/lib/quiz";
@@ -54,8 +54,8 @@ export default function QuestionScreen({
     return (
         <div className="flex w-full justify-center items-center">
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-0 w-96 h-96 bg-green-50 dark:bg-green-950/20 rounded-full blur-3xl opacity-40" />
-                <div className="absolute bottom-0 right-0 w-96 h-96 bg-green-100 dark:bg-green-900/10 rounded-full blur-3xl opacity-30" />
+                <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-40" />
+                <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl opacity-30" />
             </div>
 
             <div className="relative z-10 w-full md:w-1/2 lg:w-1/3 max-w-2xl">
@@ -98,3 +98,4 @@ export default function QuestionScreen({
         </div>
     );
 }
+
