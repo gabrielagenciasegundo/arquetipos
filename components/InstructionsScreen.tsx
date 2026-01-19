@@ -3,6 +3,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button"; // ajuste o path se necessÃ¡rio
 import Image from "next/image";
+import { CirclePlay, Clock, Crosshair, NotebookPen, NotepadText, Play } from "lucide-react";
 type Props = {
     onStart: () => void;
     onClearSaved: () => void;
@@ -41,8 +42,11 @@ export default function InstructionsScreen({ onStart, onClearSaved }: Props) {
 
                 {/* InstruÃ§Ãµes */}
                 <div className="bg-card rounded-xl shadow-lg p-8 border border-border space-y-6">
-                    <h2 className="text-3xl font-bold text-foreground">📋 Instruções</h2>
-
+                    <div className="flex flex-row items-center gap-2">
+                    <NotebookPen className=""></NotebookPen>
+                    <p className="text-3xl font-bold text-foreground">Instruções</p>
+                    </div>
+                    
                     <div className="space-y-4">
                         <p className="text-lg leading-relaxed text-foreground">
                             Indique a frequência com que cada afirmação descreve melhor o seu comportamento.
@@ -69,7 +73,7 @@ export default function InstructionsScreen({ onStart, onClearSaved }: Props) {
 
                         <div className="bg-primary/10 rounded-lg p-4 border border-accent/40">
                             <p className="text-sm text-foreground">
-                                <span className="font-bold">💡 Dica:</span> Nas perguntas do arquétipo, você pode usar as teclas{" "}
+                                <span className="font-bold"> Dica:</span> Nas perguntas do arquétipo, você pode usar as teclas{" "}
                                 <span className="font-mono font-bold">1</span> a{" "}
                                 <span className="font-mono font-bold">5</span> para selecionar e avançar automaticamente.
                             </p>
@@ -79,18 +83,20 @@ export default function InstructionsScreen({ onStart, onClearSaved }: Props) {
 
                 {/* InformaÃ§Ãµes sobre o teste */}
                 <div className="grid grid-cols-3 gap-4 md:gap-6">
-                    <div className="bg-card rounded-lg p-4 text-center border border-border shadow-sm">
-                        <div className="text-3xl mb-2">⏱️</div>
+                    <div className="flex flex-col items-center bg-card rounded-lg p-4 text-center border border-border shadow-sm">
+                        <Clock className="text-3xl mb-2"></Clock>
                         <p className="text-sm font-semibold text-foreground">~10 min</p>
                         <p className="text-xs text-muted-foreground">Tempo estimado</p>
                     </div>
-                    <div className="bg-card rounded-lg p-4 text-center border border-border shadow-sm">
-                        <div className="text-3xl mb-2">📝</div>
+                    <div className="flex flex-col items-center bg-card rounded-lg p-4 text-center border border-border shadow-sm">
+                        {/* <div className="text-3xl mb-2">📝</div> */}
+                        <NotepadText className="text-3xl mb-2"></NotepadText>
                         <p className="text-sm font-semibold text-foreground">75</p>
                         <p className="text-xs text-muted-foreground">Perguntas</p>
                     </div>
-                    <div className="bg-card rounded-lg p-4 text-center border border-border shadow-sm">
-                        <div className="text-3xl mb-2">🎯</div>
+                    <div className="flex flex-col items-center bg-card rounded-lg p-4 text-center border border-border shadow-sm">
+                        {/* <div className="text-3xl mb-2">🎯</div> */}
+                        <Crosshair className="text-3xl mb-2"></Crosshair>
                         <p className="text-sm font-semibold text-foreground">12</p>
                         <p className="text-xs text-muted-foreground">Arquétipos</p>
                     </div>
@@ -102,7 +108,7 @@ export default function InstructionsScreen({ onStart, onClearSaved }: Props) {
                         onClick={onStart}
                         className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary hover:to-accent text-primary-foreground font-bold py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border-0"
                     >
-                        ▶️ Começar o Teste
+                        <CirclePlay>play</CirclePlay> Começar o Teste
                     </Button>
 
                     <button

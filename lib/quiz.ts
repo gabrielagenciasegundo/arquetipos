@@ -103,7 +103,7 @@ export interface Question {
 
 export const ARCHETYPE_QUESTIONS: Question[] = ARCHETYPE_STATEMENTS.map((text, i) => ({
   id: `q${i + 1}`,
-  label: `${i + 1} - ${text}`,
+  label: `${text}`,
   type: "radio",
   options: LIKERT_1_5, // agora é array de {value,label}
   required: true,

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button"; // ajuste path
+import { Check } from "lucide-react";
 
 type Props = {
   isTransitioning: boolean;
@@ -37,7 +38,8 @@ export default function NavigationButtons({
         disabled={!answered || isTransitioning}
         className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-primary hover:to-accent disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transition border-0"
       >
-        {isLastQuestion ? "✅ Finalizar" : "Próximo →"}
+        
+        {isLastQuestion ? <div className="flex flex-row items-center gap-1">Finalizar<Check></Check></div> : "Próximo →"}
       </Button>
     </div>
   );

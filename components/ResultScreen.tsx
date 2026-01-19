@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { Mail, RotateCcw, StickyNote } from "lucide-react";
 import { Button } from "./ui/button";
 import { ArchetypeScore, getTopArchetypes } from "./utils/archetypes";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
@@ -323,7 +324,10 @@ export default function ResultScreen({
 
         {/* Informações de Contato */}
         <div className="w-full bg-card rounded-lg p-6 mb-12 border-l-4 border-primary shadow-md">
-          <h3 className="text-lg font-bold text-foreground mb-4">✉️ Seus Dados Pessoais</h3>
+          <div className="flex flex-row items-center gap-1 text-lg font-bold text-foreground mb-4">
+            <Mail className=""></Mail>
+            <p>Seus Dados Pessoais</p>
+          </div>
           <div className="grid gap-3 text-sm">
             <p className="flex justify-between">
               <span className="font-semibold text-muted-foreground">Nome:</span>
@@ -346,14 +350,20 @@ export default function ResultScreen({
             onClick={handleDownload}
             className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-primary hover:to-accent text-primary-foreground font-bold py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border-0"
           >
-            📄 Baixar Resultado (PDF)
+            <div className="flex flex-row items-center gap-1">
+              <StickyNote></StickyNote>
+              Baixar Resultado (PDF)
+            </div>
           </Button>
 
           <Button
             onClick={onRestart}
             className="flex-1 bg-muted text-primary hover:bg-muted/80 font-bold py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer border-2 border-primary"
           >
-            🔁 Refazer o Teste
+            <div className="flex flex-row items-center gap-1">
+              <RotateCcw></RotateCcw>
+              <p>Refazer o Teste</p>
+            </div>
           </Button>
         </div>
       </div>

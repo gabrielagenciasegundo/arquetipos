@@ -91,7 +91,7 @@ export default function QuestionScreen({
 
                 {!isInitialPhase && (
                     <p className="text-xs text-muted-foreground text-center mt-6 opacity-70">
-                        💡 Use Backspace para voltar, Enter para avançar, ou 1-5 para responder
+                        Use Backspace para voltar, Enter para avançar, ou 1-5 para responder
                     </p>
                 )}
             </div>
