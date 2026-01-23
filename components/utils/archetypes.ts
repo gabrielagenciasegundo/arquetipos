@@ -18,7 +18,7 @@ export const ARCHETYPES: ArchetypeData[] = [
   },
   {
     id: "orphan",
-    name: "Órfão",
+    name: "Homem-Comum",
     description: "Realista e pertencente",
     focus: "Realismo, pertencimento e superação de abandono.",
     questions: [14, 22, 27, 30, 50, 71],
@@ -34,7 +34,7 @@ export const ARCHETYPES: ArchetypeData[] = [
   },
   {
     id: "caregiver",
-    name: "Caridoso",
+    name: "Cuidador",
     description: "Generoso e prestativo",
     focus: "Cuidar dos outros, generosidade e sacrifício.",
     questions: [7, 10, 15, 24, 55, 68],
