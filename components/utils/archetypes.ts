@@ -26,7 +26,7 @@ export const ARCHETYPES: ArchetypeData[] = [
   },
   {
     id: "warrior",
-    name: "Guerreiro",
+    name: "Herói",
     description: "Disciplinado e corajoso",
     focus: "Disciplina, coragem e superação de desafios.",
     questions: [6, 39, 40, 44, 57, 59],
